@@ -23,7 +23,7 @@ import ssl
 import requests
 
 
-###SETUP DE LA APP -- HORARIO --  RSS Y MAS 
+###SETUP DE LA APP -- HORARIO --  RSS Y MAS de eso
 
 # Crear un contexto SSL que no verifique certificados
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -331,6 +331,27 @@ def get_top_gainers():
 
     return gainers_sorted[:10]  # Top 10 gainers
 
+#####TOP LOSERS
+def get_top_losers():
+    # Hacer una solicitud GET a la API de Binance para obtener los tickers de las últimas 24 horas
+    url = "https://api.binance.com/api/v3/ticker/24hr"
+    response = requests.get(url)
+    
+    # Comprobar que la solicitud fue exitosa
+    if response.status_code != 200:
+        st.error(f"Error al obtener datos de la API de Binance: {response.status_code}")
+        return []
+
+    # Obtener los datos de la respuesta en formato JSON
+    tickers = response.json()
+
+    # Filtrar los tickers con un cambio negativo en el precio
+    losers = [ticker for ticker in tickers if float(ticker['priceChangePercent']) < 0]
+
+    # Ordenar los tickers por el mayor porcentaje de pérdida (más negativo primero)
+    losers_sorted = sorted(losers, key=lambda x: float(x['priceChangePercent']))
+
+    return losers_sorted[:5]  # Top 5 losers
 
 ###CALCULADORA - - 
 
@@ -392,7 +413,7 @@ text = '''---'''
 st.markdown(text)
 
 st.subheader(f'🌎 Global Market 🔥💣 Liquidations 💣🔥 12h 🚨🚨')
-st.image('assets/liquidations.png')         
+st.image("http://morningbriefing.nqpmedia.com/assets/liquidations.png", caption="12 Hr Global Liquidation 🔥")         
 
 text = '''---''' 
 st.markdown(text)  
@@ -402,6 +423,8 @@ st.image("https://alternative.me/crypto/fear-and-greed-index.png", caption="Late
 
 text = '''---'''
 st.markdown(text)
+
+st.write("Report Issues or Suggestions 📝 Info@nqpmedia.com")
 
 
 
@@ -443,49 +466,42 @@ with st.sidebar:
 
     st.write('___')
 
-    ## CALCULATOR
+    ## WHALE ALERTS
     
-    st.subheader('📈 POSITION CALCULATOR 📊')
-    ### TOKEN
-    st.subheader(f'{price_ticker} = {col_price}')
+    st.markdown('# 🐋  WHALE ALERTS 🚨')
+    st.image("http://morningbriefing.nqpmedia.com/assets/whale_alert.png", caption="Latest Whale Alerts 🚨")
     
-    # Position size in USD
-    position_size = st.number_input(label="POSITION SIZE (USD) 💵", min_value=0.0, value=1000.0, step=100.0)
 
-    # LONG OR SHORT
-    position_type = st.selectbox('🟢 LONG / SHORT 🔴', ('LONG', 'SHORT'))
-    
-    # Input 1: Entry Price
-    entry_price = st.number_input(label="ENTRY PRICE 🟢", value=col_price, step=0.1)
-    
-    # Input 2: Exit Price
-    exit_price = st.number_input(label="EXIT PRICE 🛑", value=col_price, step=0.1)
-    
-    # Function to calculate gain/loss percentage and USD
-    def calculate_percentage_gain_loss(entry, exit, position, size):
-        if entry > 0:  # Avoid division by zero
-            if position == 'LONG':
-                percent_change = ((exit - entry) / entry) * 100
-                dollar_change = (exit - entry) * (size / entry)
-            elif position == 'SHORT':
-                percent_change = ((entry - exit) / entry) * 100
-                dollar_change = (entry - exit) * (size / entry)
-            return percent_change, dollar_change
-        else:
-            return 0.0, 0.0
+# TOP LOSERS
+def show_top_losers():
+    top_losers = get_top_losers()  # Suponiendo que tienes una función que obtiene los perdedores
 
-    # Button to calculate
-    if st.button("CALCULATE 💹"):
-        percent_result, dollar_result = calculate_percentage_gain_loss(entry_price, exit_price, position_type, position_size)
-        if percent_result != 0:  # Ensure meaningful output
-            st.write(f"### 🚀 {position_type.upper()} RESULT:")
-            st.write(f"📊 Percentage Change: {'+' if percent_result > 0 else ''}{percent_result:.2f}%")
-            st.write(f"💵 Dollar Change: {'+' if dollar_result > 0 else ''}${dollar_result:.2f}")
-        else:
-            st.error("Ensure entry price is greater than 0 and valid values are entered.")
+    st.sidebar.markdown('# Top 5 Losers 📉 (24h)')
 
+    if top_losers:
+        for loser in top_losers:
+            symbol = loser['symbol']
+            percent_change = loser['priceChangePercent']
+            st.sidebar.markdown(f"""
+                <div style="
+                    background-color: #eaeaea;
+                    border: 3px solid #b71c1c; 
+                    border-radius: 10px; 
+                    padding: 3px; 
+                    text-decoration: none; 
+                    font-weight: bold;
+                    color: #b71c1c;
+                    font-size: 16px;
+                    margin-bottom: 10px;">🔴 {symbol}: {percent_change}% 📉
+                </div>
+                    """, unsafe_allow_html=True)
+    else:
+        st.sidebar.text("No se pudo obtener los datos de los top losers.")
 
+# Llamamos a la función para mostrar los top losers
+show_top_losers()
 
 
 st.sidebar.write('<div style="text-align: center;">By🎙️_0xdEVbEN_🎸 </div>', unsafe_allow_html=True)
+
 
