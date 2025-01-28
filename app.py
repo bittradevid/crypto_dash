@@ -413,13 +413,13 @@ text = '''---'''
 st.markdown(text)
 
 st.subheader(f'🌎 Global Market 🔥💣 Liquidations 💣🔥 12h 🚨🚨')
-st.image("http://morningbriefing.nqpmedia.com/assets/liquidations.png", caption="12 Hr Global Liquidation 🔥")         
+st.image(load_liquidations(), caption="12 Hr Global Liquidation 🔥")              
 
 text = '''---''' 
 st.markdown(text)  
 
 st.subheader(f'🟢 Crypto 🔥😰 Fear and Greed 😤 Index 🔥 ')
-st.image(load_liquidations(), caption="Latest Crypto Fear & Greed Index")
+st.image("https://alternative.me/crypto/fear-and-greed-index.png", caption="Latest Crypto Fear & Greed Index")
 
 text = '''---'''
 st.markdown(text)
