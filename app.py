@@ -66,16 +66,7 @@ vertexai.init(project=project_id, location=location)
 if 'chat' not in st.session_state:
     model = GenerativeModel("gemini-1.0-pro")
     st.session_state.chat = model.start_chat()
-
-
-###INICIA APP - - 
-
-def main():
-
-    if 'sidebar_state' not in st.session_state:
-        st.session_state.sidebar_state = 'expanded'
-
-    
+	
 st.set_page_config(page_title="CryptoDesk", page_icon="📈",menu_items={'About':'NQPMEDIA iA_Apps 2024-2025'})
 
 # Agregar los meta tags personalizados
@@ -90,6 +81,13 @@ def add_meta_tags():
     st.markdown(meta_tags, unsafe_allow_html=True)
 
 add_meta_tags()  # Llamamos a la función para insertar las meta tags
+
+###INICIA APP - - 
+
+def main():
+
+    if 'sidebar_state' not in st.session_state:
+        st.session_state.sidebar_state = 'expanded'
 
 
 
