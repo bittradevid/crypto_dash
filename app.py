@@ -78,6 +78,18 @@ def main():
     
 st.set_page_config(page_title="CryptoDesk", page_icon="📈",menu_items={'About':'NQPMEDIA iA_Apps 2024-2025'})
 
+# Agregar los meta tags personalizados
+def add_meta_tags():
+    meta_tags = """
+    <meta property="og:title" content="☕ Morning Briefing - Boost your Trading - Optimize your Time ⌚">
+    <meta property="og:description" content=" Get real-time trading strategies, chart analysis, whale alerts, liquidation maps, and top gainers & losers 📈📉 –  powered by Gemini 2.0 , Stay ahead of the market! 📈🔍.">
+    <meta property="og:image" content="https://nqpmedia.com/assets/preview_image.png">
+    <meta property="og:url" content="https://morningbriefing.nqpmedia.com">
+    <meta name="twitter:card" content="summary_large_image">
+    """
+    st.markdown(meta_tags, unsafe_allow_html=True)
+
+add_meta_tags()  # Llamamos a la función para insertar las meta tags
 
 
 
