@@ -1,6 +1,5 @@
 import streamlit as st 
 import pandas as pd
-import yfinance as yf
 import cufflinks as cf
 import vertexai
 from vertexai.preview.generative_models import GenerativeModel, ChatSession
@@ -21,6 +20,10 @@ import json
 import os
 import ssl
 import requests
+import requests
+from io import BytesIO
+from PIL import Image
+import time
 
 
 ###SETUP DE LA APP -- HORARIO --  RSS Y MAS de eso
@@ -353,17 +356,14 @@ def get_top_losers():
 
     return losers_sorted[:5]  # Top 5 losers
 
-###CALCULADORA - - 
+###UPDATE IMAGES - - 
+def load_whale_alert():
+    response = requests.get(f"https://nqpmedia.com/assets/whale_alert.png?t={int(time.time())}")
+    return Image.open(BytesIO(response.content))
 
-def calculate_percentage_gain_loss(entry, exit, position):
-        if position == 'LONG':
-            # Formula for LONG: ((exit - entry) / entry) * 100
-            return ((exit - entry) / entry) * 100
-        elif position == 'SHORT':
-            # Formula for SHORT: ((entry - exit) / entry) * 100
-            return ((entry - exit) / entry) * 100
-        else:
-            return 0.0
+def load_liquidations():
+    response = requests.get(f"https://nqpmedia.com/assets/liquidations.png?t={int(time.time())}")
+    return Image.open(BytesIO(response.content))
 
 # STREAMLIT Multi Plot Display without Dropdown 
 
@@ -413,13 +413,13 @@ text = '''---'''
 st.markdown(text)
 
 st.subheader(f'🌎 Global Market 🔥💣 Liquidations 💣🔥 12h 🚨🚨')
-st.image("https://nqpmedia.com/assets/liquidations.png", caption="12 Hr Global Liquidation 🔥")         
+st.image("http://morningbriefing.nqpmedia.com/assets/liquidations.png", caption="12 Hr Global Liquidation 🔥")         
 
 text = '''---''' 
 st.markdown(text)  
 
 st.subheader(f'🟢 Crypto 🔥😰 Fear and Greed 😤 Index 🔥 ')
-st.image("https://alternative.me/crypto/fear-and-greed-index.png", caption="Latest Crypto Fear & Greed Index")
+st.image(load_liquidations(), caption="Latest Crypto Fear & Greed Index")
 
 text = '''---'''
 st.markdown(text)
@@ -461,7 +461,7 @@ with st.sidebar:
         else:
             st.sidebar.text("No se pudo obtener los datos de los top gainers.")
 
-# Llamamos a la función para mostrar los top gainers
+    # Llamamos a la función para mostrar los top gainers
     show_top_gainers()
 
     st.write('___')
@@ -469,7 +469,7 @@ with st.sidebar:
     ## WHALE ALERTS
     
     st.markdown('# 🐋  WHALE ALERTS 🚨')
-    st.image("https://nqpmedia.com/assets/whale_alert.png", caption="Latest Whale Alerts 🚨")
+    st.image(load_whale_alert(), caption="Latest Whale Alerts 🚨")
     
 
 # TOP LOSERS
@@ -503,5 +503,6 @@ show_top_losers()
 
 
 st.sidebar.write('<div style="text-align: center;">By🎙️_0xdEVbEN_🎸 </div>', unsafe_allow_html=True)
+
 
 
