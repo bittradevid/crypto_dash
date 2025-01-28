@@ -413,7 +413,7 @@ text = '''---'''
 st.markdown(text)
 
 st.subheader(f'🌎 Global Market 🔥💣 Liquidations 💣🔥 12h 🚨🚨')
-st.image("http://morningbriefing.nqpmedia.com/assets/liquidations.png", caption="12 Hr Global Liquidation 🔥")         
+st.image("https://morningbriefing.nqpmedia.com/assets/liquidations.png", caption="12 Hr Global Liquidation 🔥")         
 
 text = '''---''' 
 st.markdown(text)  
@@ -469,7 +469,7 @@ with st.sidebar:
     ## WHALE ALERTS
     
     st.markdown('# 🐋  WHALE ALERTS 🚨')
-    st.image("http://morningbriefing.nqpmedia.com/assets/whale_alert.png", caption="Latest Whale Alerts 🚨")
+    st.image("https://morningbriefing.nqpmedia.com/assets/whale_alert.png", caption="Latest Whale Alerts 🚨")
     
 
 # TOP LOSERS
