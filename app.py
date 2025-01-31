@@ -188,12 +188,13 @@ else:
     col_price = 0  # O algún valor por defecto
 
 
-
+ticker_mod = price_ticker[:-1] if price_ticker.endswith('USDT') else price_ticker
 #### MAIN - DESK 
+
 
 # STREAMLIT Price metric
 formatted_price = f"{col_price:,.8f}" if col_price < 1 else f"{col_price:,.2f}" 
-st.header(f" {price_ticker}📌  ")
+st.header(f" {ticker_mod}📌  ")
 st.markdown(f'# ${formatted_price}')   
 
 
@@ -245,7 +246,7 @@ def format_price(price):
 
 
 # STREAMLIT HISTORICAL PRICE 
-st.subheader(f'🔵 {price_ticker} ⚙️ Historical Price - TimeFrame ({interval_selectbox})🔥')
+st.subheader(f'🔵 {ticker_mod} ⚙️ Historical Price - TimeFrame ({interval_selectbox})🔥')
 klines_ticker_price['Date'] = klines_ticker_price['Date'].dt.strftime('%Y-%m-%d %H:%M:%S')
 table_html = (
     klines_ticker_price
@@ -260,7 +261,7 @@ text = '''---'''
 st.markdown(text)
 
 price_trend = check_price_trend(klines_ticker_price['Close'])
-st.subheader(f'Price Action Trend 📈 for 🔵 {price_ticker} on {interval_selectbox} 🕒')
+st.subheader(f'Price Action Trend 📈 for 🔵 {ticker_mod} on {interval_selectbox} 🕒')
 st.header(f" {price_trend}")
 
 text = '''---'''
@@ -324,7 +325,7 @@ def extract_data_for_prompt(klines_data, price_ticker, interval_selectbox):
     volume_data = latest_data['Volume'].tolist()
 
     # Construye el prompt con los datos extraídos
-    prompt = f"Generate a prediction for the next 8 candles for the token {price_ticker} on a {interval_selectbox} timeframe. The latest opening prices are: {open_prices}, the latest closing prices are: {close_prices}, and the volume was: {volume_data}. Summarize the expected trend and key characteristics (e.g., bullish, bearish, or sideways movement) for the upcoming 8 candles. After the prediction, propose a strategy to maximize profits based on this forecast. Avoid listing the candles individually and provide the response in a concise and actionable format. Exclude titles, additional information, and resources. Include a disclaimer at the end. If prices are lower than 1 translate cientific notation to decimals"
+    prompt = f"Generate a prediction for the next 8 candles for the token {price_ticker} on a {interval_selectbox} timeframe. The latest opening prices are: {open_prices}, the latest closing prices are: {close_prices}, and the volume was: {volume_data}. Summarize the expected trend and key characteristics (e.g., bullish, bearish, or sideways movement) for the upcoming 8 candles. After the prediction, propose a strategy to maximize profits based on this forecast. Avoid listing the candles individually and provide the response in a concise and actionable format. Exclude titles, additional information, and resources. Include a disclaimer at the end."
     
     return prompt
 
@@ -474,8 +475,10 @@ st.image("https://alternative.me/crypto/fear-and-greed-index.png", caption="Late
 text = '''---'''
 st.markdown(text)
 
-st.write("Report Issues or Suggestions 📝 Info@nqpmedia.com")
-
+st.markdown('<div style="text-align: center; ">NQP_Media_iA_Apps </div>', unsafe_allow_html=True)   
+text = '''---'''
+st.markdown(text)        
+st.markdown('<div style="text-align: right;">Report Issues or Suggestions 📝 info@nqpmedia.com</div>', unsafe_allow_html=True)     
 
 
 with st.sidebar:
