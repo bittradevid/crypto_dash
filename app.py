@@ -66,7 +66,16 @@ vertexai.init(project=project_id, location=location)
 if 'chat' not in st.session_state:
     model = GenerativeModel("gemini-1.0-pro")
     st.session_state.chat = model.start_chat()
-	
+
+
+###INICIA APP - - 
+
+def main():
+
+    if 'sidebar_state' not in st.session_state:
+        st.session_state.sidebar_state = 'expanded'
+
+    
 st.set_page_config(page_title="CryptoDesk", page_icon="📈",menu_items={'About':'NQPMEDIA iA_Apps 2024-2025'})
 
 # Agregar los meta tags personalizados
@@ -81,14 +90,6 @@ def add_meta_tags():
     st.markdown(meta_tags, unsafe_allow_html=True)
 
 add_meta_tags()  # Llamamos a la función para insertar las meta tags
-
-###INICIA APP - - 
-
-def main():
-
-    if 'sidebar_state' not in st.session_state:
-        st.session_state.sidebar_state = 'expanded'
-
 
 
 st.markdown("""
@@ -115,12 +116,12 @@ st.markdown("""
 
 # App 
 st.markdown('''
-# CRYPTO DESK 1.3 📈''')
+# CRYPTO DESK 1.5 📈''')
 st.subheader('Boost your Trading - Optimize your Time ⌚')
 st.write('---')
 st.write('Today Quotes 🧠')
-st.markdown('#### 🎨 A designer knows he has achieved perfection when there is nothing left to take away')
-st.markdown('<div style="text-align: right;">Michael J. Saylor 📝</div>', unsafe_allow_html=True)
+st.markdown('#### 💸 It is far better to buy a wonderful company at a fair price than a fair company at a wonderful price')
+st.markdown('<div style="text-align: right;">Warren Buffett 📝</div>', unsafe_allow_html=True)
 st.write('---')
 
 # Pandas Options
@@ -164,9 +165,13 @@ st.sidebar.image('assets/portada1.png', )
 
 st.sidebar.header('🌤️ MORNING BRIEFING 📈')
 
+
+
 price_ticker = st.sidebar.selectbox('Select Token', (tokens))
 st.sidebar.write('or type to search 🔎')
 interval_selectbox = st.sidebar.selectbox('Interval', ("1w","1d", "4h", "1h", "30m", "15m", "5m", "1m"))
+
+
 
 st.sidebar.subheader('📟 Explore more Tools ⬇️')
 
@@ -177,14 +182,21 @@ df_top_gainers = pd.read_json('https://api.binance.com/api/v3/ticker/24hr')
 
 # Filtrar el precio actual del token seleccionado
 col_df = df_current_prices[df_current_prices.symbol == price_ticker] 
-col_price = round_value(float(col_df.price))
+if not col_df.empty:
+    col_price = round_value(float(col_df.price.iloc[0]))  
+else:
+    col_price = 0  # O algún valor por defecto
+
 
 
 #### MAIN - DESK 
 
 # STREAMLIT Price metric
-st.metric(label=price_ticker,value=col_price) 
- 
+formatted_price = f"{col_price:,.8f}" if col_price < 1 else f"{col_price:,.2f}" 
+st.header(f" {price_ticker}📌  ")
+st.markdown(f'# ${formatted_price}')   
+
+
 # Binance klines DataFrame Preparation
 pd.options.display.float_format = '${:,.2f}'.format
 klines_url = make_klines_url(price_ticker, interval=interval_selectbox)
@@ -201,16 +213,35 @@ klines_ticker_price['Date'] = (
 
 # Función para verificar la tendencia de los precios
 def check_price_trend(prices):
-    last_8_prices = prices.tail(8)
+    last_8_prices = prices.tail(10)
     increasing_count = (last_8_prices.diff() > 0).sum()
     decreasing_count = (last_8_prices.diff() < 0).sum()
     
-    if increasing_count / 8 > 0.52:
+    if increasing_count / 10 > 0.52:
         return "🟢 ASCENDING 👆"
-    elif decreasing_count / 8 > 0.52:
+    elif decreasing_count / 10 > 0.52:
         return "🔴 DESCENDING 🔻"
     else:
         return "🟠 CORRECTION 🔄"
+
+def get_long_entry(prices):
+    last_8_prices = prices.tail(10)  # Tomamos los últimos 8 cierres
+    lowest_price = last_8_prices.min()  # Encontramos el precio mínimo
+    
+    return lowest_price
+
+def get_short_entry(prices):
+    last_8_prices = prices.tail(10)  # Tomamos los últimos 8 cierres
+    highest_price = last_8_prices.max()  # Encontramos el precio máximo
+    
+    return highest_price
+
+
+def format_price(price):
+    """Formatea el precio según su valor:
+       - Si es menor a 1 -> 8 decimales
+       - Si es mayor o igual a 1 -> sin decimales, con separador de miles"""
+    return f"{price:,.8f}" if price < 1 else f"{price:,.3f}"
 
 
 # STREAMLIT HISTORICAL PRICE 
@@ -229,9 +260,18 @@ text = '''---'''
 st.markdown(text)
 
 price_trend = check_price_trend(klines_ticker_price['Close'])
-st.subheader(f'Price Trend 📈 for 🔵 {price_ticker} on {interval_selectbox} 🕒')
+st.subheader(f'Price Action Trend 📈 for 🔵 {price_ticker} on {interval_selectbox} 🕒')
 st.header(f" {price_trend}")
 
+text = '''---'''
+st.markdown(text)
+
+long_entry_price = get_long_entry(klines_ticker_price['Close'])
+short_entry_price = get_short_entry(klines_ticker_price['Close'])
+
+st.subheader(f'🚥 Next Entry Price for 🔵 {price_ticker} on {interval_selectbox} 🕒')
+st.header(f"🟢 Long - ${format_price(long_entry_price)}")
+st.header(f"🔴 Short - ${format_price(short_entry_price)}")
 
 # STREAMLIT functions klines Dataframe Plotting
 def plot_raw_data():
@@ -284,7 +324,7 @@ def extract_data_for_prompt(klines_data, price_ticker, interval_selectbox):
     volume_data = latest_data['Volume'].tolist()
 
     # Construye el prompt con los datos extraídos
-    prompt = f"Generate a prediction for the next 8 candles for the token {price_ticker} on a {interval_selectbox} timeframe. The latest opening prices are: {open_prices}, the latest closing prices are: {close_prices}, and the volume was: {volume_data}. Summarize the expected trend and key characteristics (e.g., bullish, bearish, or sideways movement) for the upcoming 8 candles. After the prediction, propose a strategy to maximize profits based on this forecast. Avoid listing the candles individually and provide the response in a concise and actionable format. Exclude titles, additional information, and resources. Include a disclaimer at the end."
+    prompt = f"Generate a prediction for the next 8 candles for the token {price_ticker} on a {interval_selectbox} timeframe. The latest opening prices are: {open_prices}, the latest closing prices are: {close_prices}, and the volume was: {volume_data}. Summarize the expected trend and key characteristics (e.g., bullish, bearish, or sideways movement) for the upcoming 8 candles. After the prediction, propose a strategy to maximize profits based on this forecast. Avoid listing the candles individually and provide the response in a concise and actionable format. Exclude titles, additional information, and resources. Include a disclaimer at the end. If prices are lower than 1 translate cientific notation to decimals"
     
     return prompt
 
@@ -423,7 +463,7 @@ text = '''---'''
 st.markdown(text)
 
 st.subheader(f'🌎 Global Market 🔥💣 Liquidations 💣🔥 12h 🚨🚨')
-st.image(load_liquidations(), caption="12 Hr Global Liquidation 🔥")              
+st.image(load_liquidations(), caption="12 Hr Global Liquidation 🔥")         
 
 text = '''---''' 
 st.markdown(text)  
@@ -513,6 +553,7 @@ show_top_losers()
 
 
 st.sidebar.write('<div style="text-align: center;">By🎙️_0xdEVbEN_🎸 </div>', unsafe_allow_html=True)
+
 
 
 
