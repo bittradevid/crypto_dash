@@ -314,11 +314,11 @@ def plot_bb_data(): ### CHART LIVE #####
     st.plotly_chart(fig, theme='streamlit')
 
 def plot_bb_rsi(): ### CHART RSI#####
-    qf=cf.QuantFig(klines_ticker_price,legend='top',name='RSI')
-    qf.add_rsi(showbands=True)
-    qf.add_bollinger_bands() 
+    qf=cf.QuantFig(klines_ticker_price,legend='top')
+    qf.add_rsi(20, 70, 30, showbands=True)
+    qf.add_bollinger_bands(20, 2) 
     fig = qf.iplot(asFigure=True, title=f'Bollinger Bands & RSI for {price_ticker}')
-    fig.update_layout(showlegend=False)	
+    fig.update_layout(showlegend=False)
     st.plotly_chart(fig)    
 
 
@@ -486,20 +486,7 @@ if st.button(f'Launch AI Trading Strategy for {price_ticker}'):
         pyperclip.copy(response)
         st.success("Copied to clipboard!")
 
-text = '''---'''
-st.markdown(text)  
 
-# STREAMLIT HISTORICAL PRICE 
-st.subheader(f'🔵 {price_ticker} ⚙️ Historical Price - TimeFrame ({interval_selectbox})🔥')
-klines_ticker_price['Date'] = klines_ticker_price['Date'].dt.strftime('%Y-%m-%d %H:%M:%S')
-table_html = (
-    klines_ticker_price
-    .sort_values(by='Date')
-    .tail()
-    .reset_index(drop=True)
-    .to_html(index=False)  # No mostrar índice
-)
-st.markdown(table_html, unsafe_allow_html=True)
 
 text = '''---'''
 st.markdown(text)  
@@ -518,7 +505,7 @@ text = '''---'''
 st.markdown(text)
 
 st.subheader(f'🔵 {price_ticker} 🕰️ Historical Volume 📊')
-express = px.area(klines_ticker_price, x='Date', y='Volume')
+express = px.area(klines_ticker_price, x='Date', y='Volume' )
 st.write(express)
 
 text = '''---'''
@@ -647,5 +634,4 @@ def show_top_losers():
 show_top_losers()
 
 st.sidebar.write('<div style="text-align: center;">By🎙️_0xdEVbEN_🎸 </div>', unsafe_allow_html=True)
-
 
