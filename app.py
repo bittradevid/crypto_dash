@@ -24,6 +24,7 @@ from io import BytesIO
 from PIL import Image
 import time
 from st_paywall import add_auth
+import pyperclip
 
 
 ###SETUP DE LA APP -- HORARIO --  RSS Y MAS de eso
@@ -35,7 +36,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 RSS_URL = "https://www.coindesk.com/arc/outboundfeeds/rss"
 
 # Obtener la zona horaria local del sistema
-local_timezone = get_localzone() 
+local_timezone = get_localzone()
 
 
 # Cargar los quotes desde el archivo JSON
@@ -361,7 +362,7 @@ def extract_data_for_prompt(klines_data, price_ticker, interval_selectbox):
     volume_data = latest_data['Volume'].tolist()
 
     # Construye el prompt con los datos extraídos
-    prompt = f"Generate a prediction for the next 8 candles for the token {price_ticker} on a {interval_selectbox} timeframe. The latest opening prices are: {open_prices}, the latest closing prices are: {close_prices}, and the volume was: {volume_data}. Summarize the expected trend and key characteristics (e.g., bullish, bearish, or sideways movement) for the upcoming 8 candles. After the prediction, propose a strategy to maximize profits based on this forecast. Avoid listing the candles individually and provide the response in a concise and actionable format. Exclude titles, additional information, and resources. Include a disclaimer at the end."
+    prompt = f"Generate a prediction for the next 8 candles for the token {price_ticker} on a {interval_selectbox} timeframe. The latest opening prices are: {open_prices}, the latest closing prices are: {close_prices}, and the volume was: {volume_data}. Summarize the expected trend and key characteristics (e.g., bullish, bearish, or sideways movement) for the upcoming 8 candles. After the prediction, propose a {temp_prompt} strategy to maximize profits based on this forecast proposing entry and exit prices . Avoid listing the candles individually and provide the response in a concise and actionable format. Exclude titles, additional information, and resources. Include a disclaimer at the end."
     
     return prompt
 
@@ -464,8 +465,9 @@ def load_btc_dom():
 
 text = '''---'''
 st.markdown(text)
-
+# Crear un selector sin dropdown
 st.subheader(f'🤖 Create Trading Strategy for 🔵 {price_ticker} on a {interval_selectbox} Chart')
+temp_prompt = st.radio("Select a Strategy:", ["Secure", "Moderate", "Aggressive"], horizontal=True)
 
 # Botón para generar la estrategia de trading
 if st.button(f'Launch AI Trading Strategy for {price_ticker}'):
@@ -477,6 +479,11 @@ if st.button(f'Launch AI Trading Strategy for {price_ticker}'):
     
     # Mostrar la respuesta
     st.write(response)
+
+ # Botón para copiar al portapapeles
+    if st.button("📋 Copy to Clipboard"):
+        pyperclip.copy(response)
+        st.success("Copied to clipboard!")
 
 text = '''---'''
 st.markdown(text)  
@@ -638,9 +645,6 @@ def show_top_losers():
 # Llamamos a la función para mostrar los top losers
 show_top_losers()
 
-
 st.sidebar.write('<div style="text-align: center;">By🎙️_0xdEVbEN_🎸 </div>', unsafe_allow_html=True)
-
-
 
 
