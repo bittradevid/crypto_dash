@@ -35,7 +35,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 RSS_URL = "https://www.coindesk.com/arc/outboundfeeds/rss"
 
 # Obtener la zona horaria local del sistema
-local_timezone = get_localzone()
+local_timezone = get_localzone() 
 
 
 # Cargar los quotes desde el archivo JSON
