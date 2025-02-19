@@ -23,8 +23,7 @@ import requests
 from io import BytesIO
 from PIL import Image
 import time
-from st_paywall import add_auth
-import pyperclip
+from st_paywall import add_auth 
 
 
 ###SETUP DE LA APP -- HORARIO --  RSS Y MAS de eso
@@ -135,6 +134,30 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
     
+
+with st.expander("Need Help?"):
+    st.markdown("### How to Select a Token on Mobile 📱")  
+    st.markdown("""
+    On mobile devices, the **Token Selector** is located in the **sidebar**.   
+    Tap the **`>`** icon on the top-left to open the menu and choose your token. And access to more Tools🛠️.  
+    """)  
+
+    st.image("assets/help_1.png")
+
+    st.markdown("### USD Prices & Tether (USDT) 💲")  
+    st.markdown("""
+    All USD prices are displayed in **Tether (USDT)**.  
+    This ensures price consistency across different exchanges.  
+    """) 
+
+    st.image("assets/help_2.png" )
+
+    st.markdown("### Best Experience on Desktop 🖥️")  
+    st.markdown("""
+    The app is **fully functional on mobile**, but for an **optimal experience**,  
+    we recommend using it on a **desktop**. Larger screens make it easier to navigate  
+    and analyze Charts and Tools effectively.  
+    """)
 
 # App 
 st.markdown('''
@@ -481,10 +504,7 @@ if st.button(f'Launch AI Trading Strategy for {price_ticker}'):
     # Mostrar la respuesta
     st.write(response)
 
- # Botón para copiar al portapapeles
-    if st.button("📋 Copy to Clipboard"):
-        pyperclip.copy(response)
-        st.success("Copied to clipboard!")
+
 
 
 
@@ -547,7 +567,7 @@ st.image(load_btc_dom(), caption="🔵 Bitcoin Dominance 💪 // coinmarketcap.c
 text = '''---''' 
 st.markdown(text) 
 
-st.subheader(f'🟢  BTC vs GOLD 〽️ Index ') 
+st.subheader(f'🟢  BTC vs GOLD 〽️ Index ')
 st.image(load_gold_btc(), caption="🟢Bitcoin Price // 🟡Gold Price per Oz〽️ ")         
 
    
@@ -634,4 +654,5 @@ def show_top_losers():
 show_top_losers()
 
 st.sidebar.write('<div style="text-align: center;">By🎙️_0xdEVbEN_🎸 </div>', unsafe_allow_html=True)
+
 
