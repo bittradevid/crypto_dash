@@ -20,10 +20,10 @@ import json
 import os
 import ssl
 import requests
-import requests
 from io import BytesIO
 from PIL import Image
 import time
+from st_paywall import add_auth
 
 
 ###SETUP DE LA APP -- HORARIO --  RSS Y MAS de eso
@@ -36,6 +36,11 @@ RSS_URL = "https://www.coindesk.com/arc/outboundfeeds/rss"
 
 # Obtener la zona horaria local del sistema
 local_timezone = get_localzone()
+
+
+# Cargar los quotes desde el archivo JSON
+with open('quotes.json') as f:
+    quotes = json.load(f)
 
 #### IMPORTAR TOKENS JSON
 
@@ -66,6 +71,22 @@ vertexai.init(project=project_id, location=location)
 if 'chat' not in st.session_state:
     model = GenerativeModel("gemini-1.0-pro")
     st.session_state.chat = model.start_chat()
+
+
+####BTC Dominance 
+
+# CoinMarketCap API Key (sustituye con tu clave)
+CMC_API_KEY = "355e30fb-2b81-4abf-8bc6-18311fc2d2ef"
+
+# URL de la API
+CMC_URL = "https://pro-api.coinmarketcap.com/v1/global-metrics/quotes/latest"
+
+# Encabezados para la solicitud
+headers = {
+    "Accepts": "application/json",
+    "X-CMC_PRO_API_KEY": CMC_API_KEY,
+}
+
 
 
 ###INICIA APP - - 
@@ -116,13 +137,19 @@ st.markdown("""
 
 # App 
 st.markdown('''
-# CRYPTO DESK 1.5 📈''')
-st.subheader('Boost your Trading - Optimize your Time ⌚')
+# CRYPTO DESK 2.0 📈''')
+st.subheader('Boost your Trading - Optimize your Time ⌚') 
 st.write('---')
+
+# Obtener el índice del quote del día (usando el día del año para que cambie diariamente)
+day_of_year = datetime.now().timetuple().tm_yday
+quote_of_the_day = quotes[day_of_year % len(quotes)]
+
+# Mostrar el quote del día
 st.write('Today Quotes 🧠')
-st.markdown('#### 💸 It is far better to buy a wonderful company at a fair price than a fair company at a wonderful price')
-st.markdown('<div style="text-align: right;">Warren Buffett 📝</div>', unsafe_allow_html=True)
-st.write('---')
+st.markdown(f"#### 💭 {quote_of_the_day['quote']}💡")
+st.markdown(f"<div style='text-align: right;'>— {quote_of_the_day['author']} 📝</div>", unsafe_allow_html=True)
+st.write('---') 
 
 # Pandas Options
 pd.options.display.float_format = '${:,.2f}'.format
@@ -165,7 +192,7 @@ st.sidebar.image('assets/portada1.png', )
 
 st.sidebar.header('🌤️ MORNING BRIEFING 📈')
 
-
+####add_auth(required=True)
 
 price_ticker = st.sidebar.selectbox('Select Token', (tokens))
 st.sidebar.write('or type to search 🔎')
@@ -173,7 +200,7 @@ interval_selectbox = st.sidebar.selectbox('Interval', ("1w","1d", "4h", "1h", "3
 
 
 
-st.sidebar.subheader('📟 Explore more Tools ⬇️')
+st.sidebar.subheader('🟩 Explore more Tools ⬇️')
 
 
 # Obtener datos de precios actuales desde la API de Binance
@@ -188,13 +215,13 @@ else:
     col_price = 0  # O algún valor por defecto
 
 
-ticker_mod = price_ticker[:-1] if price_ticker.endswith('USDT') else price_ticker
+####ticker_mod = price_ticker[:-1] if price_ticker.endswith('USDT') else price_ticker
 #### MAIN - DESK 
 
 
 # STREAMLIT Price metric
 formatted_price = f"{col_price:,.8f}" if col_price < 1 else f"{col_price:,.2f}" 
-st.header(f" {ticker_mod}📌  ")
+st.header(f" {price_ticker}📌  ")
 st.markdown(f'# ${formatted_price}')   
 
 
@@ -245,23 +272,12 @@ def format_price(price):
     return f"{price:,.8f}" if price < 1 else f"{price:,.3f}"
 
 
-# STREAMLIT HISTORICAL PRICE 
-st.subheader(f'🔵 {ticker_mod} ⚙️ Historical Price - TimeFrame ({interval_selectbox})🔥')
-klines_ticker_price['Date'] = klines_ticker_price['Date'].dt.strftime('%Y-%m-%d %H:%M:%S')
-table_html = (
-    klines_ticker_price
-    .sort_values(by='Date')
-    .tail()
-    .reset_index(drop=True)
-    .to_html(index=False)  # No mostrar índice
-)
-st.markdown(table_html, unsafe_allow_html=True)
 
 text = '''---'''
 st.markdown(text)
 
 price_trend = check_price_trend(klines_ticker_price['Close'])
-st.subheader(f'Price Action Trend 📈 for 🔵 {ticker_mod} on {interval_selectbox} 🕒')
+st.subheader(f'Price Action Trend 📈 for 🔵 {price_ticker} on {interval_selectbox} 🕒')
 st.header(f" {price_trend}")
 
 text = '''---'''
@@ -271,8 +287,8 @@ long_entry_price = get_long_entry(klines_ticker_price['Close'])
 short_entry_price = get_short_entry(klines_ticker_price['Close'])
 
 st.subheader(f'🚥 Next Entry Price for 🔵 {price_ticker} on {interval_selectbox} 🕒')
-st.header(f"🟢 Long - ${format_price(long_entry_price)}")
-st.header(f"🔴 Short - ${format_price(short_entry_price)}")
+st.header(f"🟢 Long ⬆️ ${format_price(long_entry_price)}")
+st.header(f"🔴 Short ⬇️ ${format_price(short_entry_price)}")
 
 # STREAMLIT functions klines Dataframe Plotting
 def plot_raw_data():
@@ -289,7 +305,7 @@ def plot_raw_data_log():
 	st.plotly_chart(fig)
 
 def plot_bb_data(): ### CHART LIVE #####
-    qf=cf.QuantFig(klines_ticker_price,legend='top',name='GS')
+    qf=cf.QuantFig(klines_ticker_price,legend='top',name='GS') 
     ##qf._add_study()  ##HACER EL ESTUDIO DE ENTRY LONG - ENTRY SHORT - TPs 
     qf.add_ema(periods=[21,55], color=['green', 'red'])
     qf.add_volume(colorchange=True) 
@@ -302,6 +318,26 @@ def plot_bb_rsi(): ### CHART RSI#####
     qf.add_bollinger_bands() 
     fig = qf.iplot(asFigure=True, title=f'Bollinger Bands & RSI for {price_ticker}', )
     st.plotly_chart(fig)    
+
+
+# Obtener datos de la API  BTC Dominance
+def get_market_data():
+    response = requests.get(CMC_URL, headers=headers)
+    if response.status_code == 200:
+        data = response.json()["data"]
+        return {
+            "btc_dominance": round(data["btc_dominance"], 2),
+            "eth_dominance": round(data["eth_dominance"], 2),
+            "others_dominance": round(100 - data["btc_dominance"] - data["eth_dominance"], 2),
+            "history": [
+                {"label": "Yesterday", "btc": 59.7, "eth": 10.1, "others": 30.2},
+                {"label": "Last Week", "btc": 60.6, "eth": 10.1, "others": 29.3},
+                {"label": "Last Month", "btc": 56.9, "eth": 10.9, "others": 32.2},
+            ],
+        }
+    else:
+        st.error("Error al obtener datos del mercado")
+        return None
 
 
 ######VERTEX AI 
@@ -339,7 +375,7 @@ def fetch_news(url):
 
 def display_news(news_entries):
     """Display the latest 3 news items with styled containers."""
-    for i in range(min(3, len(news_entries))):  # Mostrar máximo 5 noticias
+    for i in range(min(5, len(news_entries))):  # Mostrar máximo 5 noticias
         entry = news_entries[i]
         title = entry.title
         link = entry.link
@@ -416,6 +452,14 @@ def load_liquidations():
     response = requests.get(f"https://nqpmedia.com/assets/liquidations.png?t={int(time.time())}")
     return Image.open(BytesIO(response.content))
 
+def load_gold_btc():
+    response = requests.get(f"https://nqpmedia.com/assets/gold_btc.png?t={int(time.time())}")
+    return Image.open(BytesIO(response.content))
+
+def load_btc_dom():
+    response = requests.get(f"https://nqpmedia.com/assets/btc_dom.png?t={int(time.time())}")
+    return Image.open(BytesIO(response.content))
+
 # STREAMLIT Multi Plot Display without Dropdown 
 
 text = '''---'''
@@ -435,13 +479,29 @@ if st.button(f'Launch AI Trading Strategy for {price_ticker}'):
     st.write(response)
 
 text = '''---'''
-st.markdown(text)    
+st.markdown(text)  
+
+# STREAMLIT HISTORICAL PRICE 
+st.subheader(f'🔵 {price_ticker} ⚙️ Historical Price - TimeFrame ({interval_selectbox})🔥')
+klines_ticker_price['Date'] = klines_ticker_price['Date'].dt.strftime('%Y-%m-%d %H:%M:%S')
+table_html = (
+    klines_ticker_price
+    .sort_values(by='Date')
+    .tail()
+    .reset_index(drop=True)
+    .to_html(index=False)  # No mostrar índice
+)
+st.markdown(table_html, unsafe_allow_html=True)
+
+text = '''---'''
+st.markdown(text)  
 
 st.subheader(f'🔵 {price_ticker} 💵🔥 Live Chart 📊 {interval_selectbox} 🔥💶 ')
 plot_bb_data()  # Asegúrate de que esta función esté definida
 
 text = '''---'''
 st.markdown(text)
+
 
 st.subheader(f'🔵 {price_ticker} 💵🔥 BB & RSI 📊 {interval_selectbox} 🔥💶 ')
 plot_bb_rsi()  # Asegúrate de que esta función esté definida  
@@ -475,6 +535,30 @@ st.image("https://alternative.me/crypto/fear-and-greed-index.png", caption="Late
 text = '''---'''
 st.markdown(text)
 
+# Obtener datos
+market_data = get_market_data()
+
+# Mostrar métricas
+if market_data:
+    st.title("📊 Bitcoin Dominance Overview")
+
+    # Sección de métricas principales
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Bitcoin Dominance", f"{market_data['btc_dominance']}%",delta_color="inverse")
+    col2.metric("Ethereum Dominance", f"{market_data['eth_dominance']}%", delta_color="off")
+    col3.metric("Others", f"{market_data['others_dominance']}%",delta_color="off")
+st.image(load_btc_dom(), caption="🔵 Bitcoin Dominance 💪 // coinmarketcap.com") 
+
+text = '''---''' 
+st.markdown(text) 
+
+st.title(f'🟢  BTC vs GOLD 〽️ Index ')
+st.image(load_gold_btc(), caption="🟢Bitcoin Price // 🟡Gold Price per Oz〽️ ")         
+
+   
+text = '''---''' 
+st.markdown(text) 
+
 st.markdown('<div style="text-align: center; ">NQP_Media_iA_Apps </div>', unsafe_allow_html=True)   
 text = '''---'''
 st.markdown(text)        
@@ -482,7 +566,7 @@ st.markdown('<div style="text-align: right;">Report Issues or Suggestions 📝 i
 
 
 with st.sidebar:
-    st.header("🛩️ Latest Crypto News 🗞️ ")
+    st.header("🟡 Latest Crypto News 🗞️📰 ")
     display_news(fetch_news(RSS_URL))
 
     st.write('___')
