@@ -547,7 +547,7 @@ st.image(load_btc_dom(), caption="🔵 Bitcoin Dominance 💪 // coinmarketcap.c
 text = '''---''' 
 st.markdown(text) 
 
-st.title(f'🟢  BTC vs GOLD 〽️ Index ')
+st.subheader(f'🟢  BTC vs GOLD 〽️ Index ') 
 st.image(load_gold_btc(), caption="🟢Bitcoin Price // 🟡Gold Price per Oz〽️ ")         
 
    
