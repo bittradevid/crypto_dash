@@ -317,7 +317,8 @@ def plot_bb_rsi(): ### CHART RSI#####
     qf=cf.QuantFig(klines_ticker_price,legend='top',name='RSI')
     qf.add_rsi(showbands=True)
     qf.add_bollinger_bands() 
-    fig = qf.iplot(asFigure=True, title=f'Bollinger Bands & RSI for {price_ticker}', )
+    fig = qf.iplot(asFigure=True, title=f'Bollinger Bands & RSI for {price_ticker}')
+    fig.update_layout(showlegend=False)	
     st.plotly_chart(fig)    
 
 
