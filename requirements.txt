@@ -102,8 +102,8 @@ pyarrow==14.0.0
 pyasn1==0.6.1
 pyasn1_modules==0.4.1
 pydantic
-pydantic-settings==2.7.1
-pydantic_core==2.27.2
+pydantic-settings
+pydantic_core
 pydeck==0.9.1
 Pygments==2.18.0
 PyJWT==2.10.1
