@@ -216,7 +216,7 @@ st.sidebar.image('assets/portada1.png', )
 
 st.sidebar.header('🌤️ MORNING BRIEFING 📈')
 
-####add_auth(required=True)
+add_auth(required=True)
 
 price_ticker = st.sidebar.selectbox('Select Token', (tokens))
 st.sidebar.write('or type to search 🔎')
