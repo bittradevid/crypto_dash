@@ -539,7 +539,7 @@ text = '''---'''
 st.markdown(text)
 
 st.subheader(f'🌎 Global Market 🔥💣 Liquidations 💣🔥 12h 🚨🚨')
-st.image(load_liquidations(), caption="12 Hr Global Liquidation 🔥")         
+st.image(load_liquidations(), caption="12 Hr Global Liquidation 🔥/ Coinank.com")         
 
 text = '''---''' 
 st.markdown(text)  
