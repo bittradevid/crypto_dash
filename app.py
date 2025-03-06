@@ -159,10 +159,10 @@ with st.expander("Need Help?"):
     and analyze Charts and Tools effectively.  
     """)
 
-# App 
+# App CRYPTO DESK 2.0 📈  -  Boost your Trading - Optimize your Time ⌚
 st.markdown('''
-# CRYPTO DESK 2.0 📈''')
-st.subheader('Boost your Trading - Optimize your Time ⌚') 
+# UPDATE IN PROGRESS 👨🏻‍💻''')
+st.subheader('We`ll be back soon with a fewer bugs (Hopefully). 🐞🐞🐛') 
 st.write('---')
 
 # Obtener el índice del quote del día (usando el día del año para que cambie diariamente)
