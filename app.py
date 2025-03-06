@@ -185,8 +185,31 @@ base_url = os.getenv("BASE_URL")
 vertex_ai = VertexAI()
 
 
-# Binance ticker's list DataFrame
-dd = pd.read_json('https://api.binance.com/api/v3/ticker/price')
+# Lista de proxies
+proxies_list = [
+    "http://188.166.197.129:3128",
+    "http://104.238.160.36:80",
+    "http://200.250.131.218:80"
+]
+
+# Seleccionar un proxy aleatorio
+proxy = {"http": random.choice(proxies_list)}
+
+# URL de la API de Binance
+url = 'https://api.binance.com/api/v3/ticker/price'
+
+try:
+    # Solicitud GET usando el proxy
+    response = requests.get(url, proxies=proxy, timeout=10)
+    response.raise_for_status()  # Verifica errores HTTP
+    data = response.json()
+
+    # Convertir a DataFrame
+    dd = pd.DataFrame(data)
+    print(dd.head())  # Mostrar primeras filas para verificar
+
+except requests.RequestException as e:
+    print(f"Error accessing Binance API: {e}")
 
 # Function for Binance URL builder
 def make_klines_url(symbol, **kwargs):
