@@ -24,6 +24,7 @@ from io import BytesIO
 from PIL import Image
 import time
 from st_paywall import add_auth 
+import random
 
 
 ###SETUP DE LA APP -- HORARIO --  RSS Y MAS de eso
