@@ -251,9 +251,27 @@ interval_selectbox = st.sidebar.selectbox('Interval', ("1w","1d", "4h", "1h", "3
 st.sidebar.subheader('🟩 Explore more Tools ⬇️')
 
 
+# Lista de proxies
+proxies_list = [
+    "http://188.166.197.129:3128",
+    "http://104.238.160.36:80",
+    "http://200.250.131.218:80"
+]
+
+# Función para realizar solicitudes usando proxies
+def get_data_with_proxy(url):
+    proxy = {"http": random.choice(proxies_list)}  # Seleccionar proxy aleatorio
+    try:
+        response = requests.get(url, proxies=proxy, timeout=10)
+        response.raise_for_status()
+        return pd.DataFrame(response.json())
+    except requests.RequestException as e:
+        print(f"Error accessing Binance API at {url}: {e}")
+        return pd.DataFrame()  # Retorna DataFrame vacío en caso de error
+
 # Obtener datos de precios actuales desde la API de Binance
-df_current_prices = pd.read_json('https://api.binance.com/api/v3/ticker/price')
-df_top_gainers = pd.read_json('https://api.binance.com/api/v3/ticker/24hr')
+df_current_prices = get_data_with_proxy('https://api.binance.com/api/v3/ticker/price')
+df_top_gainers = get_data_with_proxy('https://api.binance.com/api/v3/ticker/24hr')
 
 # Filtrar el precio actual del token seleccionado
 col_df = df_current_prices[df_current_prices.symbol == price_ticker] 
